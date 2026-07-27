@@ -9,34 +9,11 @@
       </RouterLink>
     </div>
 
-    <!-- CENTER -->
-    <nav class="nav">
-      <a href="#">About</a>
-      <a href="#">Features</a>
-      <a href="#">Tech</a>
-      <a href="#">Faq</a>
-    </nav>
-
     <!-- RIGHT -->
     <div class="right">
       <button class="theme-btn" @click="toggleTheme">
         <img :src="theme === 'dark' ? '/icons/sun.svg' : '/icons/moon.svg'" />
       </button>
-
-      <a class="login" href="/login"
-        >Log in<svg
-          class="login-arrow"
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M9 18l6-6-6-6" /></svg
-      ></a>
     </div>
   </header>
 </template>
@@ -69,8 +46,8 @@ const { theme, toggleTheme } = useTheme()
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
 
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px) !important;
+  backdrop-filter: blur(10px) !important;
 
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
   border-radius: 10px;
