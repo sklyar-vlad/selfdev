@@ -113,7 +113,7 @@ services:
   migrate:
     build:
       context: ..
-      dockerfile: infra/Dockefile.backend
+      dockerfile: infra/Dockerfile.backend
     volumes:
       - .env:/app/.env:ro
     profiles:
