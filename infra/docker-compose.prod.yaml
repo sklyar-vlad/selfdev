@@ -78,7 +78,6 @@ services:
     volumes:
       - "redis-data:/data"
 
-
   backend:
     build:
       context: ..
@@ -99,6 +98,8 @@ services:
     build:
       context: ..
       dockerfile: infra/Dockerfile.frontend
+      args:
+        MODE: ${MODE}
     restart: unless-stopped
     networks:
       - self-dev
