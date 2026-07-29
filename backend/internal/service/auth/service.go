@@ -63,7 +63,6 @@ func (s *Service) Login(ctx context.Context, code string) (string, error) {
 		} else {
 			return "", err
 		}
-		return "", err
 	}
 
 	sessionID := uuid.NewString()
