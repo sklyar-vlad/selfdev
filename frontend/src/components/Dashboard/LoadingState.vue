@@ -13,7 +13,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 24px;
+  padding: clamp(40px, 8vw, 64px) 16px;
   gap: 20px;
   min-height: 200px;
 }
@@ -39,5 +39,6 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  text-align: center;
 }
 </style>

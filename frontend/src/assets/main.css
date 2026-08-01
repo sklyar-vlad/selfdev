@@ -79,6 +79,11 @@ body,
   min-height: 100%;
 }
 
+html,
+body {
+  overflow-x: hidden;
+}
+
 /* УБИРАЕМ СЛОЙ С КАРТИНКОЙ НАВСЕГДА */
 html {
   background-color: var(--bg-primary);
@@ -102,6 +107,19 @@ body {
   z-index: 1;
   min-height: 100vh;
   background: transparent;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+button,
+.btn,
+.icon-btn,
+.theme-btn,
+.nav-tab {
+  min-height: 44px;
 }
 
 /* =========================
@@ -148,7 +166,7 @@ h3 {
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 12px 20px;
   border-radius: var(--radius-md);
   font-weight: 700;
   font-family: 'Hind Madurai', sans-serif;
@@ -161,7 +179,7 @@ h3 {
 }
 
 .btn-sm {
-  padding: 8px 18px;
+  padding: 10px 16px;
   font-size: 14px;
 }
 
@@ -184,6 +202,18 @@ h3 {
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px color-mix(in srgb, var(--accent-primary) 40%, transparent);
+}
+
+@media (max-width: 768px) {
+  .btn {
+    width: 100%;
+    padding: 12px 18px;
+  }
+
+  .btn-sm {
+    width: auto;
+    min-height: 44px;
+  }
 }
 /* ====================== */
 

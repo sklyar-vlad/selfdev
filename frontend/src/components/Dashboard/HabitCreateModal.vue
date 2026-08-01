@@ -99,6 +99,8 @@ defineEmits<{
   display: flex;
   flex-direction: column;
   gap: 14px;
+  max-height: min(92vh, 780px);
+  overflow: auto;
 }
 
 .habit-create-form h3 {
@@ -153,6 +155,7 @@ defineEmits<{
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 .habit-checkbox {
@@ -161,6 +164,7 @@ defineEmits<{
   gap: 8px;
   color: var(--text-secondary);
   font-size: 14px;
+  min-height: 44px;
 }
 
 .color-picker {
@@ -169,11 +173,12 @@ defineEmits<{
   gap: 10px;
   color: var(--text-secondary);
   font-size: 14px;
+  min-height: 44px;
 }
 
 .color-picker input[type='color'] {
-  width: 20px;
-  height: 20px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -198,5 +203,30 @@ defineEmits<{
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .habit-modal-overlay {
+    align-items: flex-end;
+    padding: 12px 12px 0;
+  }
+
+  .habit-create-form {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100vh - 12px);
+    padding: 18px 16px calc(16px + env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+  }
+
+  .habit-options,
+  .habit-create-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .habit-create-actions .btn {
+    width: 100%;
+  }
 }
 </style>

@@ -34,6 +34,7 @@ defineEmits<{
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   padding: 16px 20px;
   width: 100%;
   box-sizing: border-box;
@@ -44,19 +45,22 @@ defineEmits<{
   gap: 8px;
   flex-wrap: wrap;
   flex: 1;
+  min-width: 0;
 }
 
 .nav-tab {
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  padding: 8px 16px;
+  padding: 10px 14px;
   font-size: 14px;
   font-weight: 700;
   font-family: 'Hind Madurai', sans-serif;
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 44px;
+  white-space: nowrap;
 }
 
 .nav-tab:hover {
@@ -70,5 +74,30 @@ defineEmits<{
 
 :global(html[data-theme='dark']) .nav-tab.active {
   color: #0f1115;
+}
+
+@media (max-width: 768px) {
+  .habits-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px;
+  }
+
+  .categories-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .categories-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-tab {
+    flex: 0 0 auto;
+  }
 }
 </style>

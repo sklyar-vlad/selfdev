@@ -50,7 +50,8 @@ defineProps<{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 32px;
+  gap: 20px;
+  padding: clamp(18px, 3vw, 24px) clamp(18px, 4vw, 32px);
   flex-shrink: 0;
 }
 
@@ -58,6 +59,7 @@ defineProps<{
   display: flex;
   align-items: center;
   gap: 20px;
+  min-width: 0;
 }
 
 .avatar-image {
@@ -83,7 +85,7 @@ defineProps<{
 }
 
 .xp-level-block {
-  width: 360px;
+  width: min(360px, 100%);
 }
 
 .xp-info {
@@ -125,6 +127,7 @@ defineProps<{
 .quick-stats {
   display: flex;
   gap: 32px;
+  flex-wrap: wrap;
 }
 
 .stat-box {
@@ -148,5 +151,49 @@ defineProps<{
 
 .streak .stat-n {
   color: var(--accent-primary);
+}
+
+@media (max-width: 768px) {
+  .user-profile-section {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  }
+
+  .avatar-block {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .avatar-image {
+    width: 64px;
+    height: 64px;
+  }
+
+  .username {
+    font-size: clamp(22px, 7vw, 28px);
+  }
+
+  .xp-level-block,
+  .quick-stats {
+    width: 100%;
+  }
+
+  .quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .stat-box {
+    padding: 12px;
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--bg-primary) 78%, transparent);
+  }
+
+  .stat-n {
+    font-size: 28px;
+  }
 }
 </style>

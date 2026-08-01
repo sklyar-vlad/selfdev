@@ -425,16 +425,16 @@ const faqs = [
 .tech-grid {
   display: grid;
 
-  gap: 16px;
+  gap: clamp(12px, 2vw, 16px);
 }
 
 .feature-grid,
 .tech-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
 }
 
 .faq-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
 }
 
 .feature-card,
@@ -512,13 +512,49 @@ const faqs = [
   .content-section,
   .cta-section,
   .hero {
-    width: calc(100% - 24px);
+    width: min(100% - 16px, 100%);
   }
 
   .hero {
     min-height: auto;
 
-    padding: 96px 0 30px;
+    padding: 88px 0 24px;
+
+    text-align: center;
+  }
+
+  .hero-content,
+  .hero-panel,
+  .section-head,
+  .section-card,
+  .feature-card,
+  .faq-card,
+  .cta-card {
+    text-align: center;
+  }
+
+  .hero-content,
+  .hero-panel,
+  .section-card,
+  .feature-card,
+  .faq-card,
+  .cta-card {
+    padding: clamp(14px, 3vw, 18px);
+  }
+
+  .hero h1,
+  .section-head h2,
+  .cta-card h2 {
+    font-size: clamp(28px, 8vw, 38px);
+  }
+
+  .hero-copy,
+  .section-card p,
+  .feature-card p,
+  .tech-card p,
+  .faq-card p,
+  .cta-card p {
+    font-size: 14px;
   }
 
   .hero-actions {
@@ -534,6 +570,10 @@ const faqs = [
   .feature-grid,
   .tech-grid,
   .faq-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-panel {
     grid-template-columns: 1fr;
   }
 }

@@ -466,8 +466,9 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
-  padding: 100px 24px 40px;
+  overflow-x: clip;
+  overflow-y: visible;
+  padding: clamp(84px, 12vw, 100px) clamp(12px, 2vw, 24px) clamp(24px, 4vw, 40px);
   box-sizing: border-box;
 }
 
@@ -479,8 +480,8 @@ onMounted(async () => {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  height: calc(100vh - 150px);
+  gap: clamp(16px, 2vw, 24px);
+  min-height: calc(100vh - 150px);
 }
 
 /* =========================================
@@ -488,8 +489,8 @@ onMounted(async () => {
 ========================================= */
 .main-grid {
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  gap: clamp(16px, 2vw, 24px);
   flex: 1;
   overflow: visible;
   min-height: 0;
@@ -500,8 +501,9 @@ onMounted(async () => {
   overflow: visible;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: clamp(12px, 2vw, 16px);
   min-height: 0;
+  min-width: 0;
 }
 /* =========================================
   ICON BUTTONS (Unified & Clean)
@@ -534,7 +536,7 @@ onMounted(async () => {
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 40px 36px 40px 36px;
+  padding: clamp(20px, 3vw, 40px) clamp(16px, 3vw, 36px);
   box-sizing: border-box;
 }
 
@@ -603,7 +605,7 @@ onMounted(async () => {
 ========================================= */
 @media (max-width: 1024px) {
   .dashboard-content {
-    height: auto;
+    min-height: auto;
     overflow: visible;
   }
   .main-grid {
@@ -620,6 +622,34 @@ onMounted(async () => {
   }
   .xp-level-block {
     width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding-top: 84px;
+  }
+
+  .dashboard-content {
+    gap: 16px;
+  }
+
+  .main-grid {
+    grid-template-columns: 1fr;
+    padding-bottom: 12px;
+  }
+
+  .right-stats {
+    order: -1;
+  }
+
+  .user-profile-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .habits-scroll-window {
+    padding: 16px 12px 20px;
   }
 }
 </style>

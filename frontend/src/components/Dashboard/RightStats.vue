@@ -17,14 +17,15 @@
 .right-stats {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: clamp(14px, 2vw, 24px);
 }
 
 .stat-card {
-  padding: 24px;
+  padding: clamp(16px, 3vw, 24px);
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .stat-card h3 {
@@ -39,5 +40,11 @@
   background: var(--bg-primary);
   border-radius: var(--radius-lg);
   border: 1px dashed var(--border-default);
+}
+
+@media (max-width: 768px) {
+  .right-stats {
+    gap: 12px;
+  }
 }
 </style>

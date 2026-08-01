@@ -29,4 +29,11 @@
   display: flex;
   gap: 4px;
 }
+
+@media (max-width: 768px) {
+  .heatmap-legend {
+    justify-content: flex-start;
+    margin-top: 10px;
+  }
+}
 </style>

@@ -155,7 +155,7 @@ defineEmits<{
 
 <style scoped>
 .habit-card {
-  padding: 20px;
+  padding: clamp(16px, 3vw, 20px);
   position: relative;
   transition: all 0.25s ease;
   width: 100%;
@@ -172,26 +172,29 @@ defineEmits<{
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  gap: 16px;
 }
 
 .habit-header h2 {
-  font-size: 24px;
+  font-size: clamp(20px, 3vw, 24px);
   font-weight: 700;
   margin: 0;
+  min-width: 0;
 }
 
 .habit-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 1px solid var(--border-default);
   background: transparent;
@@ -247,7 +250,7 @@ defineEmits<{
 
 .heatmap-wrapper {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   background: var(--bg-primary);
   padding: 12px;
   border-radius: var(--radius-lg);
@@ -331,5 +334,53 @@ defineEmits<{
 .l-cubes {
   display: flex;
   gap: 4px;
+}
+
+@media (max-width: 768px) {
+  .habit-header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 16px;
+  }
+
+  .habit-title-row {
+    align-items: flex-start;
+  }
+
+  .habit-header .btn {
+    width: 100%;
+  }
+
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .heatmap-wrapper {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .days-labels {
+    font-size: 9px;
+  }
+
+  .cubes-scroll-container {
+    overflow: hidden;
+  }
+
+  .cubes-grid {
+    gap: 1px;
+  }
+
+  .cube {
+    width: 100%;
+    min-width: 0;
+    border-radius: 2px;
+  }
+
+  .heatmap-legend {
+    justify-content: flex-start;
+  }
 }
 </style>

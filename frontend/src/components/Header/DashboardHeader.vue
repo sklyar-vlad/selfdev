@@ -40,6 +40,8 @@ const { theme, toggleTheme } = useTheme()
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 
   padding: 0 24px;
 
@@ -83,54 +85,6 @@ const { theme, toggleTheme } = useTheme()
 
 .dev {
   color: var(--accent-primary);
-}
-
-/* =========================
-   NAV (DESKTOP)
-========================= */
-.nav {
-  display: flex;
-  gap: clamp(20px, 4vw, 57px);
-  justify-content: center;
-  flex: 1;
-}
-
-.nav a {
-  font-family: 'Hind Madurai', sans-serif;
-
-  font-size: clamp(14px, 1.2vw, 20px);
-  font-weight: 700;
-
-  color: var(--text-primary);
-  text-decoration: none;
-
-  position: relative;
-  transition: 0.3s;
-}
-
-.nav a:hover {
-  color: var(--accent-primary);
-  transform: translateY(-1px);
-}
-
-.nav a::after {
-  content: '';
-  position: absolute;
-
-  bottom: -6px;
-  left: 50%;
-
-  width: 0;
-  height: 2px;
-
-  background: var(--accent-primary);
-
-  transform: translateX(-50%);
-  transition: 0.3s ease;
-}
-
-.nav a:hover::after {
-  width: 100%;
 }
 
 /* =========================
@@ -197,21 +151,26 @@ const { theme, toggleTheme } = useTheme()
     0 0 20px rgba(100, 200, 255, 0.15);
 }
 
-/* =========================
-   MOBILE (MAIN FIX)
-========================= */
 @media (max-width: 768px) {
   .header {
-    padding: 0 16px;
-    height: 64px;
+    position: sticky;
+    top: 10px;
+    left: 0;
+    right: 0;
+    width: auto;
+    margin: 0 10px;
+    padding: 10px 14px;
+    height: auto;
+    align-items: center;
+    gap: 10px;
   }
 
-  .nav {
-    display: none;
+  .left {
+    flex: 0 0 auto;
   }
 
   .logo-link {
-    font-size: 18px;
+    font-size: clamp(18px, 4.8vw, 22px);
   }
 
   .theme-btn {
@@ -219,8 +178,8 @@ const { theme, toggleTheme } = useTheme()
     height: 44px;
   }
 
-  .login {
-    font-size: 16px;
+  .right {
+    margin-left: auto;
   }
 }
 </style>

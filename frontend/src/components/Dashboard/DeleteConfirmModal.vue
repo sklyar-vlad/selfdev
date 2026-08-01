@@ -38,6 +38,8 @@ defineEmits<{
 .delete-modal {
   width: min(100%, 380px);
   padding: 24px;
+  max-height: min(92vh, 420px);
+  overflow: auto;
 }
 
 .delete-modal h3 {
@@ -52,5 +54,28 @@ defineEmits<{
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .habit-modal-overlay {
+    align-items: flex-end;
+    padding: 12px 12px 0;
+  }
+
+  .delete-modal {
+    width: 100%;
+    max-width: 100%;
+    padding: 18px 16px calc(16px + env(safe-area-inset-bottom));
+    border-radius: 24px 24px 0 0;
+  }
+
+  .habit-create-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .habit-create-actions .btn {
+    width: 100%;
+  }
 }
 </style>

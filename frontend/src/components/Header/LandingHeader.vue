@@ -64,6 +64,8 @@ const { theme, toggleTheme } = useTheme()
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 
   padding: 0 24px;
 
@@ -108,15 +110,21 @@ const { theme, toggleTheme } = useTheme()
 
 .nav {
   display: flex;
-  gap: clamp(20px, 4vw, 57px);
+  gap: clamp(10px, 2vw, 18px);
   justify-content: center;
   flex: 1;
 }
 
 .nav a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 999px;
   font-family: 'Hind Madurai', sans-serif;
 
-  font-size: clamp(14px, 1.2vw, 20px);
+  font-size: clamp(14px, 1.2vw, 18px);
   font-weight: 700;
 
   color: var(--text-primary);
@@ -124,11 +132,12 @@ const { theme, toggleTheme } = useTheme()
 
   position: relative;
   transition: 0.3s;
+  white-space: nowrap;
 }
 
 .nav a:hover {
   color: var(--accent-primary);
-  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
 }
 
 .nav a::after {
@@ -215,16 +224,40 @@ const { theme, toggleTheme } = useTheme()
 
 @media (max-width: 768px) {
   .header {
-    padding: 0 16px;
-    height: 64px;
+    position: sticky;
+    top: 10px;
+    left: 0;
+    right: 0;
+    width: auto;
+    margin: 0 10px;
+    padding: 10px 14px;
+    height: auto;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .left,
+  .right {
+    flex: 0 0 auto;
   }
 
   .nav {
+    order: 3;
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+  }
+
+  .nav::-webkit-scrollbar {
     display: none;
   }
 
   .logo-link {
-    font-size: 18px;
+    font-size: clamp(18px, 4.8vw, 22px);
   }
 
   .theme-btn {
@@ -234,6 +267,10 @@ const { theme, toggleTheme } = useTheme()
 
   .login {
     font-size: 16px;
+  }
+
+  .right {
+    margin-left: auto;
   }
 }
 </style>

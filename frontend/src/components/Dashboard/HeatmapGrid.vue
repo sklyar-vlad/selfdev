@@ -31,7 +31,7 @@ defineProps<{
 <style scoped>
 .heatmap-wrapper {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   background: var(--bg-primary);
   padding: 12px;
   border-radius: var(--radius-lg);
@@ -100,5 +100,25 @@ defineProps<{
 }
 .cube[data-level='4'] {
   background: var(--habit-color);
+}
+
+@media (max-width: 768px) {
+  .heatmap-wrapper {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .days-labels {
+    font-size: 9px;
+  }
+
+  .cubes-grid {
+    gap: 1px;
+  }
+
+  .cube {
+    min-width: 0;
+    border-radius: 2px;
+  }
 }
 </style>
