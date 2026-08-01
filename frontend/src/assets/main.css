@@ -138,6 +138,44 @@ h3 {
   color: white;
 }
 
+.card-surface {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  color: var(--text-primary);
+  transition: all 0.25s ease;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-family: 'Hind Madurai', sans-serif;
+  cursor: pointer;
+  transition: 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.btn-sm {
+  padding: 8px 18px;
+  font-size: 14px;
+}
+
+.btn-danger {
+  background: var(--error);
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background: color-mix(in srgb, var(--error) 85%, black);
+  transform: translateY(-2px);
+}
+/* ====================== */
+
 /* =========================
    TOAST
 ========================= */
