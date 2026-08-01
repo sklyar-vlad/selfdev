@@ -61,10 +61,8 @@
                   :key="habit.id"
                   :habit="habit"
                   :todayStr="todayStr"
-                  :canMoveUp="filteredHabits.findIndex((h) => h.id === habit.id) === 0"
-                  :canMoveDown="
-                    filteredHabits.findIndex((h) => h.id === habit.id) === filteredHabits.length - 1
-                  "
+                  :canMoveUp="filteredHabits.findIndex(h => h.id === habit.id) > 0"
+                  :canMoveDown="filteredHabits.findIndex(h => h.id === habit.id) < filteredHabits.length - 1"
                   :isDoneToday="isHabitDoneToday(habit)"
                   :isUpdating="updatingHabits.has(habit.id)"
                   @toggle="toggleHabit(habit)"

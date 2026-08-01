@@ -236,12 +236,7 @@ defineEmits<{
   background: transparent;
 }
 
-.icon-btn.reorder + .icon-btn {
-  margin-left: 6px;
-  border-left: 1px solid var(--border-default);
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
+/* ВРЕДНЫЙ СЕЛЕКТОР УДАЛЕН ОТСЮДА */
 
 .habit-status {
   font-size: 13px;
