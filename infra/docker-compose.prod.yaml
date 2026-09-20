@@ -111,18 +111,16 @@ services:
       - 'traefik.http.services.frontend.loadbalancer.server.port=80'
 
   migrate:
-    build:
-      context: ..
-      dockerfile: infra/Dockerfile.backend
+    image: gomicro/goose:latest
     volumes:
-      - .env:/app/.env:ro
+      - ../backend/migrations:/migrations:ro
     profiles:
       - tools
     entrypoint:
       - goose
     command:
       - -dir
-      - /app/migrations
+      - /migrations
       - up
       - postgres
       - postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable

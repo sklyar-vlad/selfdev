@@ -12,13 +12,26 @@ type AuthService interface {
 }
 
 type handler struct {
-	service     AuthService
-	redirectURI string
-	logger      *zap.Logger
+	service      AuthService
+	redirectURI  string
+	cookieDomain string
+	cookieSecure bool
+	logger       *zap.Logger
 }
 
-func NewHandler(service AuthService, redirectURI string, logger *zap.Logger) *handler {
-	return &handler{service: service, redirectURI: redirectURI, logger: logger}
+func NewHandler(
+	service AuthService,
+	redirectURI, cookieDomain string,
+	cookieSecure bool,
+	logger *zap.Logger,
+) *handler {
+	return &handler{
+		service:      service,
+		redirectURI:  redirectURI,
+		cookieDomain: cookieDomain,
+		cookieSecure: cookieSecure,
+		logger:       logger,
+	}
 }
 
 func (h *handler) Callback(w http.ResponseWriter, r *http.Request) {
@@ -40,9 +53,9 @@ func (h *handler) Callback(w http.ResponseWriter, r *http.Request) {
 		Name:     "session",
 		Value:    session,
 		Path:     "/",
-		Domain:   ".self-dev.tech",
+		Domain:   h.cookieDomain,
 		HttpOnly: true,
-		Secure:   false,
+		Secure:   h.cookieSecure,
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   30 * 24 * 3600,
 	})

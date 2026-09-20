@@ -29,6 +29,8 @@ type ConfigAuth struct {
 	ClientId     string
 	ClientSecret string
 	RedirectURI  string
+	CookieDomain string
+	CookieSecure bool
 }
 
 type config struct {
@@ -46,6 +48,7 @@ func NewConfig() (config, error) {
 	readTimeout, _ := strconv.Atoi(getEnv("READ_TIMEOUT", "10"))
 	writeTimeout, _ := strconv.Atoi(getEnv("WRITE_TIMEOUT", "10"))
 	idleTimeout, _ := strconv.Atoi(getEnv("IDLE_TIMEOUT", "60"))
+	cookieSecure, _ := strconv.ParseBool(getEnv("COOKIE_SECURE", "false"))
 
 	cfg := config{
 		Server: ConfigServer{
@@ -67,6 +70,8 @@ func NewConfig() (config, error) {
 			ClientId:     getEnv("AUTH_CLIENT_ID", ""),
 			ClientSecret: getEnv("AUTH_CLIENT_SECRET", ""),
 			RedirectURI:  getEnv("REDIRECT_URI", ""),
+			CookieDomain: getEnv("COOKIE_DOMAIN", ""),
+			CookieSecure: cookieSecure,
 		},
 	}
 

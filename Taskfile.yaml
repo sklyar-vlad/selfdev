@@ -9,32 +9,35 @@ tasks:
 ### BUILD
 
   build-backend:
-    desc: build backend side for develope
+    desc: build backend side for development
     cmds:
-      - docker build -t self-dev-backend -f infra/Dockerfile.backend.dev .
+      - docker build -t self-dev-backend -f infra/Dockerfile.backend .
 
   build-frontend:
-    desc: build frontend side for develope
+    desc: build frontend side for development
     cmds:
-      - docker build -t self-dev-frontend -f infra/Dockerfile.frontend.dev .
+      - docker build --build-arg MODE=development -t self-dev-frontend -f infra/Dockerfile.frontend .
 
   build:
-    desc: build backend and frontend for develope
+    desc: build backend and frontend for development
     cmds:
-      - task dev-build-backend
-      - task dev-build-frontend
+      - task build-backend
+      - task build-frontend
 
 ### COMPOSE (DEV)
 
   dev-up:
-    desc: start all containers for develope with open backend ports and database
+    desc: initialize config and start the complete development stack
     cmds:
-      - docker compose -f ./infra/docker-compose.dev.yaml up -d --build
+      - test -f ./infra/.env || cp ./infra/.env.example ./infra/.env
+      - docker compose --env-file ./infra/.env -f ./infra/docker-compose.dev.yaml up -d --build
+      - docker compose --env-file ./infra/.env -f ./infra/docker-compose.dev.yaml restart auth
+      - until curl -fsS http://auth.self-dev.localhost/ >/dev/null; do sleep 1; done
 
   dev-down:
     desc: stop all containers 
     cmds:
-      - docker compose -f ./infra/docker-compose.dev.yaml down
+      - docker compose --env-file ./infra/.env -f ./infra/docker-compose.dev.yaml down
 
 ### COMPOSE (PROD)
 
@@ -92,7 +95,7 @@ tasks:
   logs:
     desc: check logs in real time of all containers
     cmds:
-      - docker compose -f ./infra/docker-compose.dev.yaml logs -f 
+      - docker compose --env-file ./infra/.env -f ./infra/docker-compose.dev.yaml logs -f
 
   logs-backend:
     desc: check logs in real time in backend container

@@ -14,7 +14,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=self-dev"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.self-dev.test`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.self-dev.localhost`)"
       - "traefik.http.routers.traefik.entrypoints=web"
       - "traefik.http.routers.traefik.service=api@internal"
     volumes:
@@ -29,10 +29,9 @@ services:
       - GIN_MODE=release
     volumes:
       - "./auth/conf:/conf"
-      - "./auth/logs:/logs"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.auth.rule=Host(`auth.self-dev.test`)"
+      - "traefik.http.routers.auth.rule=Host(`auth.self-dev.localhost`)"
       - "traefik.http.routers.auth.entrypoints=web"
       - "traefik.http.services.auth.loadbalancer.server.port=8000"
     networks:
@@ -40,6 +39,24 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  auth-bootstrap:
+    image: postgres:18-alpine
+    depends_on:
+      auth:
+        condition: service_started
+      db:
+        condition: service_healthy
+    command:
+      - sh
+      - -ec
+      - |
+        until psql -h db -U admin -d casdoor -c 'select 1 from application limit 1' >/dev/null 2>&1; do sleep 1; done
+        psql -h db -U admin -d casdoor -v ON_ERROR_STOP=1 -c "UPDATE application SET client_id = '7987350089e3975b24ad', client_secret = 'selfdev-local-client-secret', redirect_uris = '[\"http://api.self-dev.localhost/auth/callback\"]' WHERE owner = 'admin' AND name = 'app-built-in';"
+    environment:
+      PGPASSWORD: admin
+    networks:
+      - self-dev
 
   db:
     image: postgres:18-alpine
@@ -65,6 +82,11 @@ services:
       - self-dev
     volumes:
       - "redis-data:/data"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     build:
@@ -77,9 +99,16 @@ services:
       - self-dev
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`api.self-dev.test`)"
+      - "traefik.http.routers.backend.rule=Host(`api.self-dev.localhost`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      auth-bootstrap:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
 
   frontend:
     build:
@@ -92,26 +121,22 @@ services:
       - self-dev
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.frontend.rule=Host(`self-dev.test`)'
+      - 'traefik.http.routers.frontend.rule=Host(`self-dev.localhost`)'
       - 'traefik.http.routers.frontend.entrypoints=web'
       - 'traefik.http.services.frontend.loadbalancer.server.port=80'
 
   migrate:
-    build:
-      context: ..
-      dockerfile: infra/Dockefile.backend
+    image: gomicro/goose:latest
     volumes:
-      - .env:/app/.env:ro
-    profiles:
-      - tools
+      - ../backend/migrations:/migrations:ro
     entrypoint:
       - goose
     command:
       - -dir
-      - /app/migrations
-      - up
+      - /migrations
       - postgres
       - postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable
+      - up
     networks:
       - self-dev
     depends_on:
