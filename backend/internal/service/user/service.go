@@ -2,21 +2,16 @@ package user
 
 import (
 	"context"
-
-	"go.uber.org/zap"
-
+	"github.com/google/uuid"
 	model "github.com/sklyar-vlad/selfDev/internal/model/user"
+	"go.uber.org/zap"
 )
 
-// TODO: Update(ctx context.Context, user model.User) (model.User, error)
-// TODO: Delete(ctx context.Context, user model.User) error
 type Repository interface {
-	Create(ctx context.Context, user *model.User) error
-	GetBySub(ctx context.Context, userSub string) (model.User, error)
-	// Update(ctx context.Context, user *model.User) error
-	// GetByLogin(ctx context.Context, login string) (model.User, error)
+	Create(context.Context, *model.User) error
+	GetByLogin(context.Context, string) (model.User, error)
+	GetByID(context.Context, uuid.UUID) (model.User, error)
 }
-
 type Service struct {
 	repo   Repository
 	logger *zap.Logger
@@ -25,19 +20,12 @@ type Service struct {
 func NewService(repo Repository, logger *zap.Logger) *Service {
 	return &Service{repo: repo, logger: logger}
 }
-
-func (s *Service) CreateUser(ctx context.Context, user model.User) (model.User, error) {
-	if err := s.repo.Create(ctx, &user); err != nil {
-		return model.User{}, err
-	}
-
-	return user, nil
+func (s *Service) CreateUser(ctx context.Context, u model.User) (model.User, error) {
+	return u, s.repo.Create(ctx, &u)
 }
-
-func (s *Service) GetUserBySub(ctx context.Context, userSub string) (model.User, error) {
-	user, err := s.repo.GetBySub(ctx, userSub)
-	if err != nil {
-		return model.User{}, err
-	}
-	return user, nil
+func (s *Service) GetUserByID(ctx context.Context, id uuid.UUID) (model.User, error) {
+	return s.repo.GetByID(ctx, id)
+}
+func (s *Service) GetUserByLogin(ctx context.Context, l string) (model.User, error) {
+	return s.repo.GetByLogin(ctx, l)
 }

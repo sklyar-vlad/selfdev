@@ -267,6 +267,10 @@ function applyHabitDates(habitId: string, dates: string[]) {
   )
 }
 
+async function fetchCurrentUser() {
+  user.value = await fetchJson<User>('/api/me')
+}
+
 async function fetchHabits() {
   const data = await fetchJson<{
     habits?: Array<{
@@ -448,7 +452,7 @@ onMounted(async () => {
   loading.value = true
   error.value = ''
   try {
-    await fetchHabits()
+    await Promise.all([fetchCurrentUser(), fetchHabits()])
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load dashboard'
   } finally {

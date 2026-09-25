@@ -22,42 +22,6 @@ services:
     networks:
       - self-dev
 
-  auth:
-    image: casbin/casdoor:latest
-    restart: unless-stopped
-    environment:
-      - GIN_MODE=release
-    volumes:
-      - "./auth/conf:/conf"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.auth.rule=Host(`auth.self-dev.localhost`)"
-      - "traefik.http.routers.auth.entrypoints=web"
-      - "traefik.http.services.auth.loadbalancer.server.port=8000"
-    networks:
-      - self-dev
-    depends_on:
-      db:
-        condition: service_healthy
-
-  auth-bootstrap:
-    image: postgres:18-alpine
-    depends_on:
-      auth:
-        condition: service_started
-      db:
-        condition: service_healthy
-    command:
-      - sh
-      - -ec
-      - |
-        until psql -h db -U admin -d casdoor -c 'select 1 from application limit 1' >/dev/null 2>&1; do sleep 1; done
-        psql -h db -U admin -d casdoor -v ON_ERROR_STOP=1 -c "UPDATE application SET client_id = '7987350089e3975b24ad', client_secret = 'selfdev-local-client-secret', redirect_uris = '[\"http://api.self-dev.localhost/auth/callback\"]' WHERE owner = 'admin' AND name = 'app-built-in';"
-    environment:
-      PGPASSWORD: admin
-    networks:
-      - self-dev
-
   db:
     image: postgres:18-alpine
     networks:
@@ -104,8 +68,6 @@ services:
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
     depends_on:
       migrate:
-        condition: service_completed_successfully
-      auth-bootstrap:
         condition: service_completed_successfully
       redis:
         condition: service_healthy

@@ -28,6 +28,10 @@ func (r *repository) CreateSession(ctx context.Context, sessionID string, userID
 	return r.redis.Set(ctx, "session:"+sessionID, userID.String(), 30*24*time.Hour).Err()
 }
 
+func (r *repository) DeleteSession(ctx context.Context, sessionID string) error {
+	return r.redis.Del(ctx, "session:"+sessionID).Err()
+}
+
 func (r *repository) GetSession(ctx context.Context, sessionID string) (uuid.UUID, error) {
 	userIDStr, err := r.redis.Get(ctx, "session:"+sessionID).Result()
 	if err != nil {

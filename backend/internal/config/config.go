@@ -26,9 +26,6 @@ type ConfigDatabase struct {
 }
 
 type ConfigAuth struct {
-	ClientId     string
-	ClientSecret string
-	RedirectURI  string
 	CookieDomain string
 	CookieSecure bool
 }
@@ -67,9 +64,6 @@ func NewConfig() (config, error) {
 			RedisURL:    getEnv("REDIS_URL", "redis://:admin@redis:6379/0"),
 		},
 		Auth: ConfigAuth{
-			ClientId:     getEnv("AUTH_CLIENT_ID", ""),
-			ClientSecret: getEnv("AUTH_CLIENT_SECRET", ""),
-			RedirectURI:  getEnv("REDIRECT_URI", ""),
 			CookieDomain: getEnv("COOKIE_DOMAIN", ""),
 			CookieSecure: cookieSecure,
 		},

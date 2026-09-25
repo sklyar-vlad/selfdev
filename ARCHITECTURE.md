@@ -1,6 +1,6 @@
 # Архитектура SelfDev
 
-SelfDev — трекер привычек с Vue SPA, Go HTTP API, PostgreSQL, Redis и внешним OAuth/OIDC-провайдером Casdoor. Компоненты запускаются через Docker Compose и публикуются Traefik по разным хостам.
+SelfDev — трекер привычек с Vue SPA, Go HTTP API, PostgreSQL, Redis и встроенной аутентификацией. Компоненты запускаются через Docker Compose и публикуются Traefik по разным хостам.
 
 ## Карта репозитория
 
@@ -19,24 +19,22 @@ SelfDev — трекер привычек с Vue SPA, Go HTTP API, PostgreSQL, R
   - `internal/service/` — сценарии аутентификации, пользователей и привычек.
   - `internal/repository/` — SQL-запросы к PostgreSQL и сессии в Redis.
   - `internal/model/` — доменные структуры `User`, `Habit` и отметки выполнения.
-  - `internal/integrations/casdoor/` — адаптер OAuth token exchange и загрузки userinfo из Casdoor.
   - `internal/config/` — загрузка переменных окружения.
   - `database/` — создание клиентов PostgreSQL и Redis.
   - `middleware/` — CORS и проверка cookie-сессии.
   - `migrations/` — goose-миграции схемы приложения.
   - `logger/` — настройка zap для development/production.
 - `infra/` — контейнеризация и окружение.
-  - `docker-compose.dev.yaml`, `docker-compose.prod.yaml` — Traefik, frontend, backend, Casdoor, PostgreSQL, Redis и служебный контейнер миграций.
+  - `docker-compose.dev.yaml`, `docker-compose.prod.yaml` — Traefik, frontend, backend, PostgreSQL, Redis и служебный контейнер миграций.
   - `Dockerfile.backend`, `Dockerfile.frontend` — сборка API и SPA.
   - `nginx.conf` — раздача SPA с fallback на `index.html`.
-  - `auth/conf/` — конфигурация и начальные данные Casdoor.
-  - `postgres/init.sql` — создаёт отдельную БД `casdoor`; таблицы приложения создают миграции.
+  - `postgres/init.sql` — оставлен пустым; таблицы приложения создают миграции.
   - `.env.example` — шаблон runtime/Compose/goose-переменных.
 - `Taskfile.yaml` — команды запуска, миграций, форматирования и логов.
 
 ## Точки входа и поток зависимостей
 
-Frontend начинается в `frontend/index.html` и `frontend/src/main.ts`; `App.vue` выводит текущий `RouterView`. Основные пользовательские сценарии сосредоточены в `Landing.vue` (переход в Casdoor) и `Dashboard.vue` (CRUD и отметки привычек через API).
+Frontend начинается в `frontend/index.html` и `frontend/src/main.ts`; `App.vue` выводит текущий `RouterView`. Основные пользовательские сценарии сосредоточены в `Landing.vue` (регистрация и вход) и `Dashboard.vue` (CRUD и отметки привычек через API).
 
 Backend начинается в `backend/cmd/api/main.go` и собирается в одном направлении:
 
@@ -45,8 +43,8 @@ HTTP request
   -> CORS / session middleware
   -> handler + DTO
   -> service
-  -> repository / Casdoor adapter
-  -> PostgreSQL, Redis или Casdoor
+  -> repository
+  -> PostgreSQL и Redis
 ```
 
 Связи задаются небольшими интерфейсами рядом с потребителем, а конкретные реализации связываются вручную в `main.go`. Поэтому для изменения HTTP-контракта нужно начинать с `internal/handler/<domain>/` и frontend `Dashboard.vue`; для бизнес-сценария — с `internal/service/<domain>/`; для хранения — с `internal/repository/<domain>/` и `migrations/`.
@@ -54,19 +52,19 @@ HTTP request
 Основные домены:
 
 - `habit`: полный CRUD привычек и создание/удаление/чтение дат выполнения; цепочка `handler/habit` → `service/habit` → `repository/habit` → таблицы `habits`, `habits_completed`.
-- `auth`: callback от Casdoor, получение профиля, поиск или создание локального пользователя и выпуск случайной session ID; цепочка `handler/auth` → `service/auth` → `integrations/casdoor`, `service/user`, `repository/auth`.
+- `auth`: локальная регистрация и вход по email/username и паролю, профиль пользователя и выпуск session ID; цепочка `handler/auth` → `service/auth` → `service/user`, `repository/auth`.
 - `user`: модель и persistence пользователя используются аутентификацией; публичные user endpoints пока не зарегистрированы.
 
 ## HTTP и аутентификация
 
 Маршруты регистрирует `backend/internal/handler/router.go` на стандартном `net/http.ServeMux`:
 
-- публичный `GET /auth/callback` завершает OAuth flow;
+- публичные `POST /auth/register`, `POST /auth/login` и `POST /auth/logout` управляют локальной аутентификацией;
 - защищённые `/api/*` обслуживают список, создание, изменение и удаление привычек, а также `/api/habit/{id}/confirm` для отметок выполнения.
 
 `main.go` помещает весь `/api/` subtree за `middleware/session.go`. Middleware читает cookie `session`, получает из Redis `user_id` и кладёт UUID в context запроса. Habit handler извлекает его из context, преобразует JSON через `internal/handler/habit/dto/` и вызывает service. CORS middleware оборачивает оба набора маршрутов и разрешает credentials для origin из `MIDDLEWARE`.
 
-Frontend вызывает `${VITE_API_HOST}/api/...` с `credentials: 'include'`. Login/signup перенаправляют браузер на `${VITE_AUTH_HOST}/...`; Casdoor возвращает authorization code на backend callback, который устанавливает cookie и перенаправляет пользователя на `${REDIRECT_URI}/me/profile`.
+Frontend вызывает `${VITE_API_HOST}/api/...` и `/auth/register`, `/auth/login`, `/auth/logout` с `credentials: 'include'`; backend устанавливает HttpOnly cookie `session`.
 
 ## Данные и миграции
 
@@ -76,11 +74,11 @@ Frontend вызывает `${VITE_API_HOST}/api/...` с `credentials: 'include'`
 
 ## Конфигурация и запуск
 
-Backend `internal/config/config.go` при старте обязательно загружает `.env` через `godotenv`, затем читает `POSTGRES_URL`, `REDIS_URL`, `AUTH_CLIENT_ID`, `AUTH_CLIENT_SECRET`, `REDIRECT_URI`, `COOKIE_DOMAIN`, `COOKIE_SECURE`, `MIDDLEWARE`, `ENV` и HTTP timeouts. Сервер фактически слушает `:8080`; поля `HOST` и `ADDR` сейчас не используются. В development пустой `COOKIE_DOMAIN` создаёт host-only cookie, а в production следует задать домен и `COOKIE_SECURE=true`. В Compose `infra/.env` монтируется как `/app/.env`.
+Backend `internal/config/config.go` при старте обязательно загружает `.env` через `godotenv`, затем читает `POSTGRES_URL`, `REDIS_URL`, `COOKIE_DOMAIN`, `COOKIE_SECURE`, `MIDDLEWARE`, `ENV` и HTTP timeouts. Сервер фактически слушает `:8080`; поля `HOST` и `ADDR` сейчас не используются. В development пустой `COOKIE_DOMAIN` создаёт host-only cookie, а в production следует задать домен и `COOKIE_SECURE=true`. В Compose `infra/.env` монтируется как `/app/.env`.
 
-Frontend получает конфигурацию при сборке из `VITE_AUTH_HOST`, `VITE_API_HOST`, `VITE_REDIRECT_URI`, `VITE_CASDOOR_CLIENT_ID`; `MODE` из Compose выбирает соответствующий Vite env-файл. Для development используются автоматически резолвящиеся хосты `*.self-dev.localhost`, поэтому ручная правка `/etc/hosts` не нужна. `task dev-up` поднимает локальный стек и применяет миграции, `task prod-up` — production Compose, `task dev-frontend` — только Vite dev server.
+Frontend получает конфигурацию при сборке из `VITE_API_HOST`; `MODE` из Compose выбирает соответствующий Vite env-файл. Для development используются автоматически резолвящиеся хосты `*.self-dev.localhost`, поэтому ручная правка `/etc/hosts` не нужна. `task dev-up` поднимает локальный стек и применяет миграции, `task prod-up` — production Compose, `task dev-frontend` — только Vite dev server.
 
-Development bootstrap Casdoor выполняется сервисом `auth-bootstrap`: он фиксирует OAuth client ID/secret и callback в локальной базе. Для production значения auth и cookie должны быть заменены на собственные.
+Для production следует задать домен cookie и `COOKIE_SECURE=true`.
 
 ## Тесты и проверки
 

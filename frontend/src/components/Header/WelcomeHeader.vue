@@ -9,42 +9,31 @@
       </RouterLink>
     </div>
 
-    <!-- CENTER -->
-    <nav class="nav">
-      <a href="#about">About</a>
-      <a href="#features">Features</a>
-      <a href="#tech">Tech</a>
-      <a href="#faq">Faq</a>
-    </nav>
-
     <!-- RIGHT -->
     <div class="right">
       <button class="theme-btn" @click="toggleTheme">
         <img :src="theme === 'dark' ? '/icons/sun.svg' : '/icons/moon.svg'" />
       </button>
 
-      <button class="login" @click="login">
-        <span>
-          Log in
-          <img :src="theme === 'dark' ? '/icons/arrowWhite.svg' : '/icons/arrowDark.svg'" />
-        </span>
-      </button>
+      <RouterLink to="/login" class="login">
+        <span class="login"
+          >Log in<img :src="theme === 'dark' ? '/icons/arrowWhite.svg' : '/icons/arrowDark.svg'"
+        /></span>
+      </RouterLink>
     </div>
   </header>
 </template>
 
 <script setup>
 import { useTheme } from '@/composables/useTheme'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-
-const login = () => router.push('/login')
 
 const { theme, toggleTheme } = useTheme()
 </script>
 
 <style scoped>
+/* =========================
+   HEADER CONTAINER
+========================= */
 .header {
   position: fixed;
   top: 10px;
@@ -57,21 +46,22 @@ const { theme, toggleTheme } = useTheme()
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
 
   padding: 0 24px;
 
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
 
-  -webkit-backdrop-filter: blur(10px) !important;
-  backdrop-filter: blur(10px) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
   border-radius: 10px;
 }
 
+/* =========================
+   LEFT (LOGO)
+========================= */
 .logo-link {
   font-family: 'Montserrat', sans-serif;
   transition: transform 0.25s ease;
@@ -101,23 +91,20 @@ const { theme, toggleTheme } = useTheme()
   color: var(--accent-primary);
 }
 
+/* =========================
+   NAV (DESKTOP)
+========================= */
 .nav {
   display: flex;
-  gap: clamp(10px, 2vw, 18px);
+  gap: clamp(20px, 4vw, 57px);
   justify-content: center;
   flex: 1;
 }
 
 .nav a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 10px 14px;
-  border-radius: 999px;
   font-family: 'Hind Madurai', sans-serif;
 
-  font-size: clamp(14px, 1.2vw, 18px);
+  font-size: clamp(14px, 1.2vw, 20px);
   font-weight: 700;
 
   color: var(--text-primary);
@@ -125,12 +112,11 @@ const { theme, toggleTheme } = useTheme()
 
   position: relative;
   transition: 0.3s;
-  white-space: nowrap;
 }
 
 .nav a:hover {
   color: var(--accent-primary);
-  background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+  transform: translateY(-1px);
 }
 
 .nav a::after {
@@ -153,6 +139,9 @@ const { theme, toggleTheme } = useTheme()
   width: 100%;
 }
 
+/* =========================
+   RIGHT
+========================= */
 .right {
   display: flex;
   align-items: center;
@@ -160,21 +149,17 @@ const { theme, toggleTheme } = useTheme()
 }
 
 .login {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-
   font-family: 'Hind Madurai', sans-serif;
+
   font-size: clamp(16px, 1.2vw, 24px);
   font-weight: 700;
 
   color: var(--text-primary);
+  text-decoration: none;
 
   display: flex;
   align-items: center;
   gap: 6px;
-
-  transition: 0.25s;
 }
 
 .login-arrow {
@@ -187,6 +172,9 @@ const { theme, toggleTheme } = useTheme()
   opacity: 1;
 }
 
+/* =========================
+   THEME BUTTON
+========================= */
 .theme-btn {
   width: 56px;
   height: 56px;
@@ -215,42 +203,21 @@ const { theme, toggleTheme } = useTheme()
     0 0 20px rgba(100, 200, 255, 0.15);
 }
 
+/* =========================
+   MOBILE (MAIN FIX)
+========================= */
 @media (max-width: 768px) {
   .header {
-    position: sticky;
-    top: 10px;
-    left: 0;
-    right: 0;
-    width: auto;
-    margin: 0 10px;
-    padding: 10px 14px;
-    height: auto;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .left,
-  .right {
-    flex: 0 0 auto;
+    padding: 0 16px;
+    height: 64px;
   }
 
   .nav {
-    order: 3;
-    flex: 1 1 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 2px;
-  }
-
-  .nav::-webkit-scrollbar {
     display: none;
   }
 
   .logo-link {
-    font-size: clamp(18px, 4.8vw, 22px);
+    font-size: 18px;
   }
 
   .theme-btn {
@@ -260,10 +227,6 @@ const { theme, toggleTheme } = useTheme()
 
   .login {
     font-size: 16px;
-  }
-
-  .right {
-    margin-left: auto;
   }
 }
 </style>

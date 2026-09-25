@@ -1,9 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import Landing from '@/views/Landing.vue'
+import LoginPage from '@/views/LoginPage.vue'
+import RegisterPage from '@/views/RegisterPage.vue'
 import Dashboard from '@/views/Dashboard.vue'
 
 const routes: RouteRecordRaw[] = [
+  { path: '/login', name: 'Login', component: LoginPage },
+  { path: '/register', name: 'Register', component: RegisterPage },
   {
     path: '/me/profile',
     name: 'Dashboard',

@@ -31,8 +31,6 @@ tasks:
     cmds:
       - test -f ./infra/.env || cp ./infra/.env.example ./infra/.env
       - docker compose --env-file ./infra/.env -f ./infra/docker-compose.dev.yaml up -d --build
-      - docker compose --env-file ./infra/.env -f ./infra/docker-compose.dev.yaml restart auth
-      - until curl -fsS http://auth.self-dev.localhost/ >/dev/null; do sleep 1; done
 
   dev-down:
     desc: stop all containers 

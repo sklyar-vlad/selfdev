@@ -4,7 +4,7 @@
       <img class="avatar-image" :src="defaultAvatar" alt="User avatar" />
       <div class="user-name-wrapper">
         <span class="user-label">User</span>
-        <h1 class="username">{{ user?.username || 'SelfDev_Hero' }}</h1>
+        <h1 class="username">{{ user?.username || 'User' }}</h1>
       </div>
     </div>
 

@@ -2,75 +2,69 @@ package auth
 
 import (
 	"context"
-	"errors"
-
 	"github.com/google/uuid"
-	"go.uber.org/zap"
-
 	appErrors "github.com/sklyar-vlad/selfDev/internal/errors"
-	auth "github.com/sklyar-vlad/selfDev/internal/integrations/casdoor"
 	model "github.com/sklyar-vlad/selfDev/internal/model/user"
+	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
+	"strings"
 )
 
 type UserService interface {
-	GetUserBySub(ctx context.Context, userSub string) (model.User, error)
-	CreateUser(ctx context.Context, user model.User) (model.User, error)
+	GetUserByLogin(context.Context, string) (model.User, error)
+	CreateUser(context.Context, model.User) (model.User, error)
 }
-
-type AuthAdapter interface {
-	GetAccess(code, state string) (string, error)
-	GetUserInfo(token string) (auth.AuthUser, error)
-}
-
 type AuthRepository interface {
-	CreateSession(ctx context.Context, sessionID string, userID uuid.UUID) error
+	CreateSession(context.Context, string, uuid.UUID) error
+	DeleteSession(context.Context, string) error
 }
-
 type Service struct {
-	userService UserService
-	authAdapter AuthAdapter
-	repo        AuthRepository
-	logger      *zap.Logger
+	users    UserService
+	sessions AuthRepository
+	logger   *zap.Logger
 }
 
-func NewService(
-	userService UserService,
-	authAdapter AuthAdapter,
-	repo AuthRepository,
-	logger *zap.Logger,
-) *Service {
-	return &Service{userService: userService, authAdapter: authAdapter, repo: repo, logger: logger}
+func NewService(u UserService, r AuthRepository, l *zap.Logger) *Service {
+	return &Service{users: u, sessions: r, logger: l}
 }
-
-func (s *Service) Login(ctx context.Context, code string) (string, error) {
-	access, err := s.authAdapter.GetAccess(code, "")
-	if err != nil {
-		return "", err
+func (s *Service) Register(ctx context.Context, username, email, password, avatar string) (model.User, string, error) {
+	username = strings.TrimSpace(username)
+	email = strings.ToLower(strings.TrimSpace(email))
+	if len(username) < 2 || len(username) > 30 || !strings.Contains(email, "@") {
+		return model.User{}, "", appErrors.ErrInvalidEmail
 	}
-
-	authUser, err := s.authAdapter.GetUserInfo(access)
-	if err != nil {
-		return "", err
+	if len(password) < 8 {
+		return model.User{}, "", appErrors.ErrInvalidPassword
 	}
-
-	user, err := s.userService.GetUserBySub(ctx, authUser.Sub)
-	if err != nil {
-		if errors.Is(err, appErrors.ErrUserNotFound) {
-			user, err = s.userService.CreateUser(ctx, model.NewUser(authUser.Sub, authUser.Username))
-			if err != nil {
-				return "", err
-			}
-		} else {
-			return "", err
-		}
+	if _, err := s.users.GetUserByLogin(ctx, email); err == nil {
+		return model.User{}, "", appErrors.ErrEmailAlreadyExists
 	}
-
-	sessionID := uuid.NewString()
-	err = s.repo.CreateSession(ctx, sessionID, user.UserId)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return "", err
+		return model.User{}, "", err
 	}
-
-	s.logger.Info("success auth", zap.String("username", user.Username))
-	return sessionID, nil
+	u := model.NewUser(username, email, string(hash), avatar)
+	if _, err = s.users.CreateUser(ctx, u); err != nil {
+		return model.User{}, "", err
+	}
+	sid, err := s.newSession(ctx, u.UserId)
+	return u, sid, err
+}
+func (s *Service) Login(ctx context.Context, login, password string) (model.User, string, error) {
+	u, err := s.users.GetUserByLogin(ctx, strings.TrimSpace(login))
+	if err != nil || bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)) != nil {
+		return model.User{}, "", appErrors.ErrUnauthorized
+	}
+	sid, err := s.newSession(ctx, u.UserId)
+	return u, sid, err
+}
+func (s *Service) Logout(ctx context.Context, sid string) error {
+	return s.sessions.DeleteSession(ctx, sid)
+}
+func (s *Service) newSession(ctx context.Context, id uuid.UUID) (string, error) {
+	sid := uuid.NewString()
+	return sid, s.sessions.CreateSession(ctx, sid, id)
+}
+func PublicUser(u model.User) map[string]any {
+	return map[string]any{"user_id": u.UserId, "username": u.Username, "email": u.Email, "avatar_url": u.AvatarURL}
 }

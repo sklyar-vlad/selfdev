@@ -5,13 +5,16 @@ import (
 )
 
 type AuthHandler interface {
-	Callback(w http.ResponseWriter, r *http.Request)
+	Register(w http.ResponseWriter, r *http.Request)
+	Login(w http.ResponseWriter, r *http.Request)
+	Logout(w http.ResponseWriter, r *http.Request)
 }
 
 // TODO: GetUsers(w http.ResponseWriter, r *http.Request)
 // TODO: DeleteUser(w http.ResponseWriter, r *http.Request)
 // TODO: UpdateUser(w http.ResponseWriter, r *http.Request)
 type UserHandler interface {
+	GetCurrent(w http.ResponseWriter, r *http.Request)
 	// CreateUser(w http.ResponseWriter, r *http.Request)
 	// GetUser(w http.ResponseWriter, r *http.Request)
 }
@@ -28,7 +31,9 @@ type HabitHandler interface {
 }
 
 func RegisterPublicRoutes(mux *http.ServeMux, authHandler AuthHandler) {
-	mux.HandleFunc("GET /auth/callback", authHandler.Callback)
+	mux.HandleFunc("POST /auth/register", authHandler.Register)
+	mux.HandleFunc("POST /auth/login", authHandler.Login)
+	mux.HandleFunc("POST /auth/logout", authHandler.Logout)
 }
 
 // TODO: mux.HandleFunc("GET /api/users", userHandler.GetUsers)
@@ -40,6 +45,7 @@ func RegisterPublicRoutes(mux *http.ServeMux, authHandler AuthHandler) {
 // mux.HandleFunc("GET /api/users/{id}", userHandler.GetUser)
 
 func RegisterProtectedRoutes(mux *http.ServeMux, userHandler UserHandler, habitHandler HabitHandler) {
+	mux.HandleFunc("GET /api/me", userHandler.GetCurrent)
 	mux.HandleFunc("GET /api/habits", habitHandler.GetHabits)
 	mux.HandleFunc("POST /api/habit", habitHandler.CreateHabit)
 	mux.HandleFunc("PUT /api/habit/{id}", habitHandler.UpdateHabit)

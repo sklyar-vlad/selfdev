@@ -32,27 +32,6 @@ services:
       - self-dev
 
 
-  auth:
-    image: casbin/casdoor:latest
-    restart: unless-stopped
-    environment:
-      - GIN_MODE=release
-    volumes:
-      - "./auth/conf:/conf"
-      - "./auth/logs:/logs"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.auth.rule=Host(`auth.self-dev.tech`)"
-      - "traefik.http.routers.auth.entrypoints=websecure"
-      - "traefik.http.routers.auth.tls.certresolver=le"
-      - "traefik.http.services.auth.loadbalancer.server.port=8000"
-    networks:
-      - self-dev
-    depends_on:
-      db:
-        condition: service_healthy
-
-
   db:
     image: postgres:18-alpine
     networks:

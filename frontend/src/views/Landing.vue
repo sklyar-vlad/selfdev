@@ -14,7 +14,7 @@
         </p>
 
         <div class="hero-actions">
-          <button @click="casdoorSignup" class="btn btn-primary">Create account</button>
+          <button @click="signup" class="btn btn-primary">Create account</button>
         </div>
       </div>
 
@@ -106,7 +106,7 @@
         </p>
 
         <div class="hero-actions">
-          <button @click="casdoorSignup" class="btn btn-primary">Create account</button>
+          <button @click="signup" class="btn btn-primary">Create account</button>
         </div>
       </div>
     </section>
@@ -115,18 +115,11 @@
 
 <script setup lang="ts">
 import LandingHeader from '@/components/Header/LandingHeader.vue'
-import { config } from '@/config/env'
+import { useRouter } from 'vue-router'
 
-const casdoorSignup = () => {
-  const url =
-    `${config.authUrl}/signup/oauth/authorize` +
-    `?client_id=${config.casdoorClientId}` +
-    `&response_type=code` +
-    `&scope=${encodeURIComponent('openid profile email')}` +
-    `&redirect_uri=${encodeURIComponent(config.redirectUri)}`
+const router = useRouter()
 
-  window.location.href = url
-}
+const signup = () => router.push('/register')
 
 const features = [
   {

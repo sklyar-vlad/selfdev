@@ -17,7 +17,6 @@ import (
 	authHand "github.com/sklyar-vlad/selfDev/internal/handler/auth"
 	habitHand "github.com/sklyar-vlad/selfDev/internal/handler/habit"
 	userHand "github.com/sklyar-vlad/selfDev/internal/handler/user"
-	authAdapt "github.com/sklyar-vlad/selfDev/internal/integrations/casdoor"
 	authRepo "github.com/sklyar-vlad/selfDev/internal/repository/auth"
 	habitRepo "github.com/sklyar-vlad/selfDev/internal/repository/habit"
 	userRepo "github.com/sklyar-vlad/selfDev/internal/repository/user"
@@ -63,15 +62,12 @@ func main() {
 	habitRepository := habitRepo.NewRepository(pool, logger)
 	authRepository := authRepo.NewRepository(pool, redis, logger)
 
-	authAdapter := authAdapt.NewAdapter(cfg.Auth)
-
 	userService := userSrv.NewService(userRepository, logger)
-	authService := authSrv.NewService(userService, authAdapter, authRepository, logger)
+	authService := authSrv.NewService(userService, authRepository, logger)
 	habitService := habitSrv.NewService(habitRepository, logger)
 
 	authHandler := authHand.NewHandler(
 		authService,
-		cfg.Auth.RedirectURI,
 		cfg.Auth.CookieDomain,
 		cfg.Auth.CookieSecure,
 		logger,
